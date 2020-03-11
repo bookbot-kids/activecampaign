@@ -12,15 +12,32 @@ class ActiveCampaign {
 
   HTTP _http;
   String _apiKey;
+  String _baseUrl;
+  String _proxyUrl;
 
   /// Init with configurations
-  /// Requires to have `activeCampaignUrl` & `activeCampaignKey`
-  /// The url format is https://[activeCampaignAccount].api-us1.com/api/3/
-  /// Or using a proxy server to bypass CORs
+  /// Requires to have `activeCampaignAccount` & `activeCampaignKey`
+  /// It also supports a `proxyUrl` to bypass CORs
   static void config(Map config) {
-    shared._http = HTTP(config["activeCampaignUrl"], config);
+    shared._proxyUrl = config["proxyUrl"];
+    shared._baseUrl =
+        'https://${config["activeCampaignAccount"]}.api-us1.com/api/3/';
+    if (shared._proxyUrl != null) {
+      shared._http = HTTP(shared._proxyUrl, config);
+    } else {
+      shared._http = HTTP(shared._baseUrl, config);
+    }
     shared._apiKey = config['activeCampaignKey'];
     shared._http.headers = {"Api-Token": config['activeCampaignKey']};
+  }
+
+  /// Get the url if using proxy
+  get url {
+    if (_proxyUrl != null) {
+      return _baseUrl;
+    }
+
+    return '';
   }
 
   /// Add a tag into contact. Create if not exist
@@ -31,7 +48,7 @@ class ActiveCampaign {
     }
 
     // get all tags
-    var response = await _http.get("tags");
+    var response = await _http.get("${url}tags");
     var tagIds = Map<String, String>();
     if (response['tags'] != null) {
       List tags = response['tags'];
@@ -53,7 +70,7 @@ class ActiveCampaign {
         }
       }
       """;
-      var response = await _http.post('tags', data: body);
+      var response = await _http.post('${url}tags', data: body);
       if (response['tag'] != null) {
         tagId = response['tag']['id'];
       }
@@ -80,7 +97,7 @@ class ActiveCampaign {
       """;
     // add tag to contact
     try {
-      var response = await _http.post('contactTags', data: body);
+      var response = await _http.post('${url}contactTags', data: body);
       if (response['contactTag'] != null) {
         return response;
       }
@@ -94,7 +111,7 @@ class ActiveCampaign {
   Future<dynamic> createContact(
       String email, String firstName, String lastName) async {
     // get all contacts
-    var response = await _http.get("contacts");
+    var response = await _http.get("${url}contacts");
     var contact;
     if (response['contacts'] != null) {
       List contacts = response['contacts'];
@@ -113,7 +130,7 @@ class ActiveCampaign {
           }
         }
         """;
-      var response = await _http.post('contacts', data: body);
+      var response = await _http.post('${url}contacts', data: body);
       if (response['contact'] != null) {
         return response['contact'];
       }
