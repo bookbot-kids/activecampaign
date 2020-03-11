@@ -23,7 +23,7 @@ class ActiveCampaign {
     shared._baseUrl =
         'https://${config["activeCampaignAccount"]}.api-us1.com/api/3/';
     if (shared._proxyUrl != null) {
-      shared._http = HTTP(shared._proxyUrl, config);
+      shared._http = HTTP(null, config);
     } else {
       shared._http = HTTP(shared._baseUrl, config);
     }
@@ -34,7 +34,7 @@ class ActiveCampaign {
   /// Get the url if using proxy
   get url {
     if (_proxyUrl != null) {
-      return _baseUrl;
+      return _proxyUrl + _baseUrl;
     }
 
     return '';
