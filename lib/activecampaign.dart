@@ -14,11 +14,11 @@ class ActiveCampaign {
   String _apiKey;
 
   /// Init with configurations
-  /// Requires to have `activeCampaignAccount` & `activeCampaignKey`
+  /// Requires to have `activeCampaignUrl` & `activeCampaignKey`
+  /// The url format is https://[activeCampaignAccount].api-us1.com/api/3/
+  /// Or using a proxy server to bypass CORs
   static void config(Map config) {
-    shared._http = HTTP(
-        'https://${config["activeCampaignAccount"]}.api-us1.com/api/3/',
-        config);
+    shared._http = HTTP(config["activeCampaignUrl"], config);
     shared._apiKey = config['activeCampaignKey'];
     shared._http.headers = {"Api-Token": config['activeCampaignKey']};
   }
