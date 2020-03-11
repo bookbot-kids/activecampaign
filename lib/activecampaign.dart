@@ -13,6 +13,8 @@ class ActiveCampaign {
   HTTP _http;
   String _apiKey;
 
+  /// Init with configurations
+  /// Requires to have `activeCampaignAccount` & `activeCampaignKey`
   static void config(Map config) {
     shared._http = HTTP(
         'https://${config["activeCampaignAccount"]}.api-us1.com/api/3/',
@@ -21,7 +23,8 @@ class ActiveCampaign {
     shared._http.headers = {"Api-Token": config['activeCampaignKey']};
   }
 
-  Future<bool> addTagToContact(
+  /// Add a tag into contact. Create if not exist
+  Future<dynamic> addTagToContact(
       String email, String firstName, String lastName, String tag) async {
     if (_apiKey == null) {
       throw new Exception("you must call ActiveCampaign.config() first");
@@ -57,17 +60,16 @@ class ActiveCampaign {
     }
 
     // create contact if not exist
-    var contactId = await createContact(email, firstName, lastName);
-    if (contactId != null && tagId != null) {
-      await addTagIdToContactId(tagId, contactId);
-    } else {
-      return false;
+    var contact = await createContact(email, firstName, lastName);
+    if (contact != null && tagId != null) {
+      return await addTagIdToContactId(tagId, contact['id']);
     }
 
-    return true;
+    return null;
   }
 
-  Future<bool> addTagIdToContactId(String tagId, String contactId) async {
+  /// Add tag id to a contact
+  Future<dynamic> addTagIdToContactId(String tagId, String contactId) async {
     var body = """
       {
         "contactTag": {
@@ -80,14 +82,16 @@ class ActiveCampaign {
     try {
       var response = await _http.post('contactTags', data: body);
       if (response['contactTag'] != null) {
-        return true;
+        return response;
       }
     } catch (e) {}
 
-    return false;
+    return null;
   }
 
-  Future<String> createContact(
+  /// Create contact if not exist
+  /// Return a contact object
+  Future<dynamic> createContact(
       String email, String firstName, String lastName) async {
     // get all contacts
     var response = await _http.get("contacts");
@@ -111,12 +115,10 @@ class ActiveCampaign {
         """;
       var response = await _http.post('contacts', data: body);
       if (response['contact'] != null) {
-        return response['contact']['id'];
+        return response['contact'];
       }
-    } else {
-      return contact['id'];
     }
 
-    return null;
+    return contact;
   }
 }
