@@ -14,14 +14,21 @@ class ActiveCampaign {
   String _apiKey;
   String _baseUrl;
   String _proxyUrl;
+  bool _enableHttp;
 
   /// Init with configurations
   /// Requires to have `activeCampaignAccount` & `activeCampaignKey`
   /// It also supports a `proxyUrl` to bypass CORs
   static void config(Map config) {
     shared._proxyUrl = config["proxyUrl"];
-    shared._baseUrl =
-        'https://${config["activeCampaignAccount"]}.api-us1.com/api/3/';
+    shared._enableHttp = config["enableHttp"] ?? false;
+    if (shared._enableHttp == true) {
+      shared._baseUrl =
+          'https://${config["activeCampaignAccount"]}.api-us1.com/api/3/';
+    } else {
+      shared._baseUrl = '${config["activeCampaignAccount"]}.api-us1.com/api/3/';
+    }
+
     if (shared._proxyUrl != null) {
       shared._http = HTTP(null, config);
     } else {
