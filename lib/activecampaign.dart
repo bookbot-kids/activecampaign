@@ -21,7 +21,7 @@ class ActiveCampaign {
   /// It also supports a `proxyUrl` to bypass CORs
   static void config(Map config) {
     shared._proxyUrl = config["proxyUrl"];
-    shared._enableHttp = config["enableHttp"] ?? false;
+    shared._enableHttp = config["enableHttp"] ?? true;
     if (shared._enableHttp == true) {
       shared._baseUrl =
           'https://${config["activeCampaignAccount"]}.api-us1.com/api/3/';
