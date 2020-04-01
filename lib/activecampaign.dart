@@ -41,8 +41,8 @@ class ActiveCampaign {
     shared._apiKey = config['activeCampaignKey'];
     shared._http.headers = {"Api-Token": config['activeCampaignKey']};
 
-    shared._eventKey = config["eventKey"];
-    shared._eventActid = config["eventActid"];
+    shared._eventKey = config["activeCampaignEventKey"];
+    shared._eventActid = config["activeCampaignEventActid"];
   }
 
   /// Get the url if using proxy
