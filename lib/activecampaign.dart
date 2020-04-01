@@ -19,11 +19,13 @@ class ActiveCampaign {
   bool _enableHttp;
   String _eventKey;
   String _eventActid;
+  Map _config;
 
   /// Init with configurations
   /// Requires to have `activeCampaignAccount` & `activeCampaignKey`
   /// It also supports a `proxyUrl` to bypass CORs
   static void config(Map config) {
+    shared._config = config;
     shared._proxyUrl = config["proxyUrl"];
     shared._enableHttp = config["enableHttp"] ?? true;
     if (shared._enableHttp == true) {
@@ -158,16 +160,6 @@ class ActiveCampaign {
       throw new Exception("you must call ActiveCampaign.config() first");
     }
 
-    var eventBody = """
-        {
-          "eventTrackingEvent": {
-            "name": "$eventName"
-          }
-        }
-        """;
-
-    await _http.post("${url}eventTrackingEvents", data: eventBody);
-
     HTTP http;
     String subUrl;
     if (_proxyUrl != null) {
@@ -177,16 +169,10 @@ class ActiveCampaign {
         subUrl = _proxyUrl + 'trackcmp.net/';
       }
 
-      http = HTTP(null, {
-        'logLevel': 2,
-        'headers': {'content-type': 'application/x-www-form-urlencoded'}
-      });
+      http = HTTP(null, _config);
     } else {
       subUrl = '';
-      http = HTTP('https://trackcmp.net/', {
-        'logLevel': 2,
-        'headers': {'content-type': 'application/x-www-form-urlencoded'}
-      });
+      http = HTTP('https://trackcmp.net/', _config);
     }
 
     http.dio.options.contentType = 'application/x-www-form-urlencoded';
@@ -196,13 +182,12 @@ class ActiveCampaign {
     var params = {
       'key': _eventKey,
       'event': eventName,
-      'eventdata': Uri.encodeFull(eventData),
+      'eventdata': eventData,
       'actid': _eventActid,
-      'visit': Uri.encodeFull(visit)
+      'visit': visit
     };
 
-    var rep =
-        await http.post('${subUrl}event', parameters: params, data: params);
+    var rep = await http.post('${subUrl}event', data: params);
     return rep;
   }
 }
