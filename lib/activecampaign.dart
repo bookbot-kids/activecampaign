@@ -1,5 +1,7 @@
 library activecampaign;
 
+import 'dart:convert';
+
 import 'package:sync_db/sync_db.dart';
 
 class ActiveCampaign {
@@ -15,6 +17,8 @@ class ActiveCampaign {
   String _baseUrl;
   String _proxyUrl;
   bool _enableHttp;
+  String _eventKey;
+  String _eventActid;
 
   /// Init with configurations
   /// Requires to have `activeCampaignAccount` & `activeCampaignKey`
@@ -36,6 +40,9 @@ class ActiveCampaign {
     }
     shared._apiKey = config['activeCampaignKey'];
     shared._http.headers = {"Api-Token": config['activeCampaignKey']};
+
+    shared._eventKey = config["eventKey"];
+    shared._eventActid = config["eventActid"];
   }
 
   /// Get the url if using proxy
@@ -144,5 +151,41 @@ class ActiveCampaign {
     }
 
     return contact;
+  }
+
+  Future<dynamic> trackEvent(String eventName, String email, Map data) async {
+    if (_eventKey == null || _eventActid == null) {
+      throw new Exception("you must call ActiveCampaign.config() first");
+    }
+
+    var eventBody = """
+        {
+          "eventTrackingEvent": {
+            "name": "$eventName"
+          }
+        }
+        """;
+
+    await _http.post("${url}eventTrackingEvents", data: eventBody);
+
+    var http = HTTP('https://trackcmp.net/', {
+      'logLevel': 2,
+      'headers': {'content-type': 'application/x-www-form-urlencoded'}
+    });
+
+    http.dio.options.contentType = 'application/x-www-form-urlencoded';
+    var visit = '{"email" : "$email"}';
+    var eventData = json.encode(data);
+
+    var params = {
+      'key': _eventKey,
+      'event': eventName,
+      'eventdata': Uri.encodeFull(eventData),
+      'actid': _eventActid,
+      'visit': Uri.encodeFull(visit)
+    };
+
+    var rep = await http.post('event', parameters: params, data: params);
+    return rep;
   }
 }
