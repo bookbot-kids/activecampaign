@@ -168,10 +168,26 @@ class ActiveCampaign {
 
     await _http.post("${url}eventTrackingEvents", data: eventBody);
 
-    var http = HTTP('https://trackcmp.net/', {
-      'logLevel': 2,
-      'headers': {'content-type': 'application/x-www-form-urlencoded'}
-    });
+    HTTP http;
+    String subUrl;
+    if (_proxyUrl != null) {
+      if (_enableHttp) {
+        subUrl = _proxyUrl + 'https://trackcmp.net/';
+      } else {
+        subUrl = _proxyUrl + 'trackcmp.net/';
+      }
+
+      http = HTTP(null, {
+        'logLevel': 2,
+        'headers': {'content-type': 'application/x-www-form-urlencoded'}
+      });
+    } else {
+      subUrl = '';
+      http = HTTP('https://trackcmp.net/', {
+        'logLevel': 2,
+        'headers': {'content-type': 'application/x-www-form-urlencoded'}
+      });
+    }
 
     http.dio.options.contentType = 'application/x-www-form-urlencoded';
     var visit = '{"email" : "$email"}';
@@ -185,7 +201,8 @@ class ActiveCampaign {
       'visit': Uri.encodeFull(visit)
     };
 
-    var rep = await http.post('event', parameters: params, data: params);
+    var rep =
+        await http.post('${subUrl}event', parameters: params, data: params);
     return rep;
   }
 }
