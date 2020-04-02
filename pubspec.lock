@@ -299,7 +299,7 @@ packages:
     description:
       path: "."
       ref: sync_data
-      resolved-ref: a3817086479bf04b8a70c3f8f08cbf3b93616bf2
+      resolved-ref: "0a4aeb0028448e5037221492ae2f8f31f64f9341"
       url: "git://github.com/bookbot-kids/sync_db.git"
     source: git
     version: "0.0.0"
