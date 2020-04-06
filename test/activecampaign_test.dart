@@ -15,12 +15,21 @@ void main() {
     ActiveCampaign.config(configs);
     // add tag
     var result = await ActiveCampaign.shared.addTagToContact(
-        "your_email@domain.com", "first name", "last name", "your tag");
+        "youremail@gmail.com", "tag1",
+        firstName: "firstname", lastName: "lastname", forceUpdated: true);
     expect(true, result != null);
 
+    // update properties
+    var updateResult = await ActiveCampaign.shared.updateProperties(
+        "youremail@gmail.com",
+        firstName: "firstname",
+        lastName: "lastname",
+        properties: {"property1": "value1", "property2": "value2"});
+    expect(true, updateResult == null);
+
     // tracking
-    var trackingResult = await ActiveCampaign.shared.trackEvent(
-        'event_name', 'your_email@domain.com', {'your_property': 'your_data'});
+    var trackingResult = await ActiveCampaign.shared
+        .trackEvent('event_name', 'youremail@gmail.com', 'event data');
     expect(true, trackingResult != null);
   });
 }
