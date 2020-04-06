@@ -57,8 +57,8 @@ class ActiveCampaign {
   }
 
   /// Add a tag into contact. Create if not exist
-  Future<dynamic> addTagToContact(
-      String email, String firstName, String lastName, String tag) async {
+  Future<dynamic> addTagToContact(String email, String tag,
+      {String firstName, String lastName, bool forceUpdated = false}) async {
     if (_apiKey == null) {
       throw new Exception("you must call ActiveCampaign.config() first");
     }
@@ -93,7 +93,8 @@ class ActiveCampaign {
     }
 
     // create contact if not exist
-    var contact = await createContact(email, firstName, lastName);
+    var contact = await createContact(email,
+        firstName: firstName, lastName: lastName, forceUpdated: forceUpdated);
     if (contact != null && tagId != null) {
       return await addTagIdToContactId(tagId, contact['id']);
     }
@@ -122,17 +123,79 @@ class ActiveCampaign {
     return null;
   }
 
+  Future<dynamic> updateProperties(String email,
+      {String firstName,
+      String lastName,
+      Map<String, String> properties,
+      bool forceUpdated = false}) async {
+    if (properties == null) {
+      return null;
+    }
+    var contact = await createContact(email,
+        firstName: firstName, lastName: lastName, forceUpdated: forceUpdated);
+    if (contact == null || contact['id'] == null) {
+      return null;
+    }
+
+    var contactId = contact['id'];
+    var response = await _http.get("${url}fields");
+    if (response['fields'] != null) {
+      for (var property in properties.entries) {
+        String fieldId;
+        for (var field in response['fields']) {
+          if (property.key == field['title']) {
+            fieldId = field['id'];
+            break;
+          }
+        }
+
+        if (fieldId == null) {
+          // create custom field
+          var body = """
+          {
+          "field": {
+            "type": "text",
+            "title": "${property.key}",
+            "descript": "${property.key}",
+            "visible": 1,
+            }
+          }
+          """;
+          var res = await _http.post("${url}fields", data: body);
+          fieldId = res['field']['id'];
+        }
+
+        // Update field value
+        var body = """
+          {
+            "fieldValue": {
+                "contact": $contactId,
+                "field": $fieldId,
+                "value": "${property.value}"
+            }
+          }
+          """;
+
+        await _http.post("${url}fieldValues", data: body);
+      }
+    }
+
+    return null;
+  }
+
   /// Create contact if not exist
   /// Return a contact object
-  Future<dynamic> createContact(
-      String email, String firstName, String lastName) async {
-    // get all contacts
-    var response = await _http.get("${url}contacts");
+  Future<dynamic> createContact(String email,
+      {String firstName, String lastName, bool forceUpdated = false}) async {
     var contact;
-    if (response['contacts'] != null) {
-      List contacts = response['contacts'];
-      contact = contacts.firstWhere((item) => item['email'] == email,
-          orElse: () => null);
+    if (forceUpdated) {
+      // get all contacts
+      var response = await _http.get("${url}contacts");
+      if (response['contacts'] != null) {
+        List contacts = response['contacts'];
+        contact = contacts.firstWhere((item) => item['email'] == email,
+            orElse: () => null);
+      }
     }
 
     if (contact == null) {
@@ -146,7 +209,7 @@ class ActiveCampaign {
           }
         }
         """;
-      var response = await _http.post('${url}contacts', data: body);
+      var response = await _http.post('${url}contact/sync', data: body);
       if (response['contact'] != null) {
         return response['contact'];
       }
@@ -155,7 +218,8 @@ class ActiveCampaign {
     return contact;
   }
 
-  Future<dynamic> trackEvent(String eventName, String email, Map data) async {
+  Future<dynamic> trackEvent(
+      String eventName, String email, String eventData) async {
     if (_eventKey == null || _eventActid == null) {
       throw new Exception("you must call ActiveCampaign.config() first");
     }
@@ -177,7 +241,6 @@ class ActiveCampaign {
 
     http.dio.options.contentType = 'application/x-www-form-urlencoded';
     var visit = '{"email" : "$email"}';
-    var eventData = json.encode(data);
 
     var params = {
       'key': _eventKey,
