@@ -298,8 +298,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "1.0.1"
-      resolved-ref: "1803450cafacaab6db753d56cd76a3b34a2083e5"
+      ref: "1.0.2"
+      resolved-ref: "2217a23ccd20d4eecb43b1d4a03d0eb15c921500"
       url: "git://github.com/bookbot-kids/sync_db.git"
     source: git
     version: "0.0.0"

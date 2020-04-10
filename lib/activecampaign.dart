@@ -1,7 +1,5 @@
 library activecampaign;
 
-import 'dart:convert';
-
 import 'package:sync_db/sync_db.dart';
 
 class ActiveCampaign {
