@@ -197,7 +197,7 @@ packages:
       name: petitparser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.0"
+    version: "3.0.2"
   platform:
     dependency: transitive
     description:
@@ -298,8 +298,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: sync_data
-      resolved-ref: "0a4aeb0028448e5037221492ae2f8f31f64f9341"
+      ref: "1.0.1"
+      resolved-ref: "1803450cafacaab6db753d56cd76a3b34a2083e5"
       url: "git://github.com/bookbot-kids/sync_db.git"
     source: git
     version: "0.0.0"
@@ -358,7 +358,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.6.1"
+    version: "3.7.0"
   zone_local:
     dependency: transitive
     description:
