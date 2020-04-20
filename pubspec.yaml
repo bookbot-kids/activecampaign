@@ -13,7 +13,7 @@ dependencies:
   sync_db:
     git:
       url: git://github.com/bookbot-kids/sync_db.git
-      ref: 1.0.2
+      ref: 1.0.3
 
 dev_dependencies:
   flutter_test:
