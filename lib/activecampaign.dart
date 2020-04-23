@@ -1,6 +1,6 @@
 library activecampaign;
 
-import 'package:sync_db/sync_db.dart';
+import 'package:activecampaign/robust_http.dart';
 
 class ActiveCampaign {
   //singleton

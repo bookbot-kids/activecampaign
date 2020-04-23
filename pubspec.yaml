@@ -10,10 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  sync_db:
-    git:
-      url: git://github.com/bookbot-kids/sync_db.git
-      ref: 1.0.3
+  dio: ^3.0.5
+  connectivity: ^0.4.5+3
+  intl: ^0.16.0
 
 dev_dependencies:
   flutter_test:
