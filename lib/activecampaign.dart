@@ -186,17 +186,16 @@ class ActiveCampaign {
   Future<dynamic> createContact(String email,
       {String firstName, String lastName, bool forceUpdated = false}) async {
     var contact;
-    if (forceUpdated) {
-      // get all contacts
-      var response = await _http.get("${url}contacts");
-      if (response['contacts'] != null) {
-        List contacts = response['contacts'];
-        contact = contacts.firstWhere((item) => item['email'] == email,
-            orElse: () => null);
-      }
+    // get contact by email
+    var params = {'email': email};
+    var response = await _http.get("${url}contacts", parameters: params);
+    if (response['contacts'] != null) {
+      List contacts = response['contacts'];
+      contact = contacts.firstWhere((item) => item['email'] == email,
+          orElse: () => null);
     }
 
-    if (contact == null) {
+    if (contact == null || forceUpdated == true) {
       // create new contact
       var body = """
         {
