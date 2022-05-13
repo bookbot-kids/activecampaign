@@ -85,12 +85,12 @@ class HTTP {
   /// Handle exceptions that come from various failures
   void _handleException(dynamic error) async {
     print(error.toString());
-    if (error.type == DioErrorType.CONNECT_TIMEOUT ||
-        error.type == DioErrorType.RECEIVE_TIMEOUT) {
+    if (error.type == DioErrorType.connectTimeout ||
+        error.type == DioErrorType.receiveTimeout) {
       if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
         throw ConnectivityException();
       }
-    } else if (error.type == DioErrorType.RESPONSE) {
+    } else if (error.type == DioErrorType.response) {
       throw UnexpectedResponseException();
     } else {
       print(error.toString());
