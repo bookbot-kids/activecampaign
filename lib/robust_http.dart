@@ -1,6 +1,6 @@
 import 'package:activecampaign/robust_http_log.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:connectivity/connectivity.dart';
 import 'exceptions.dart';
 
 class HTTP {
@@ -70,7 +70,7 @@ class HTTP {
             (await dio.request(url, queryParameters: parameters, data: data));
         return fullResponse == true ? response : response.data;
       } catch (error) {
-        await _handleException(error);
+        _handleException(error);
       }
     }
     // Exhausted retries, so send back exception
