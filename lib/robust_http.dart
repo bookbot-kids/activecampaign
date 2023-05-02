@@ -13,8 +13,10 @@ class HTTP {
 
     final baseOptions = BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: options["connectTimeout"] ?? 60000,
-        receiveTimeout: options["receiveTimeout"] ?? 60000,
+        connectTimeout:
+            Duration(milliseconds: options["connectTimeout"] ?? 60000),
+        receiveTimeout:
+            Duration(milliseconds: options["receiveTimeout"] ?? 60000),
         headers: options["headers"] ?? {});
 
     dio = new Dio(baseOptions);
@@ -85,12 +87,13 @@ class HTTP {
   /// Handle exceptions that come from various failures
   void _handleException(dynamic error) async {
     print(error.toString());
-    if (error.type == DioErrorType.connectTimeout ||
+    if (error.type == DioErrorType.connectionTimeout ||
+        error.type == DioErrorType.sendTimeout ||
         error.type == DioErrorType.receiveTimeout) {
       if (await Connectivity().checkConnectivity() == ConnectivityResult.none) {
         throw ConnectivityException();
       }
-    } else if (error.type == DioErrorType.response) {
+    } else if (error.type == DioErrorType.badResponse) {
       throw UnexpectedResponseException();
     } else {
       print(error.toString());
